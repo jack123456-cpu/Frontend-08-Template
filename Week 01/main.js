@@ -25,14 +25,17 @@ function init(pattern) {
 
 function move(x, y) {
   pattern[y][x] = color;
-  if (check()) {
+  if (check(pattern, color)) {
     alert(color === 2 ? '❌ is win' : '⭕️ is win');
   }
   color = 3 - color;
   init(pattern);
+  if (willWin(pattern, color)) {
+    console.log(color === 2 ? '❌ will win' : '⭕️ will win');
+  }
 }
 
-function check() {
+function check(pattern, color) {
   for (let i = 0; i < 3; ++i) {
     let win = true;
     for (let j = 0; j < 3; ++j) {
@@ -81,6 +84,25 @@ function check() {
       return win;
     }
   }
+}
+
+function clone(pattern) {
+  return JSON.parse(JSON.stringify(pattern));
+}
+
+function willWin(pattern, color) {
+  for (let i = 0; i < pattern['length']; ++i) {
+    for (let j = 0; j < pattern[i]['length']; ++j) {
+      if (pattern[i][j]) continue;
+
+      const temp = clone(pattern);
+      temp[i][j] = color;
+      if (check(temp, color)) {
+        return true;
+      }
+    }
+  }
+  return false;
 }
 
 let color = 1;
