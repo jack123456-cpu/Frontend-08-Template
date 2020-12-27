@@ -15,7 +15,7 @@ function init(pattern) {
       cell.classList.add('cell');
       cell.textContent =
         pattern[i][j] === 1 ? '⭕️' : pattern[i][j] === 2 ? '❌' : '';
-      cell.addEventListener('click', () => move(j, i));
+      cell.addEventListener('click', () => userMove(j, i));
       board.appendChild(cell);
     }
     const br = document.createElement('br');
@@ -23,16 +23,32 @@ function init(pattern) {
   }
 }
 
-function move(x, y) {
+function userMove(x, y) {
   pattern[y][x] = color;
   if (check(pattern, color)) {
     alert(color === 2 ? '❌ is win' : '⭕️ is win');
   }
   color = 3 - color;
   init(pattern);
-  if (willWin(pattern, color)) {
-    console.log(color === 2 ? '❌ will win' : '⭕️ will win');
+  computerMove();
+  // console.log(bestChoices(pattern, color));
+
+  // if (willWin(pattern, color)) {
+  //   console.log(color === 2 ? '❌ will win' : '⭕️ will win');
+  // }
+}
+
+function computerMove() {
+  let choice = bestChoices(pattern, color);
+  if (choice['point']) {
+    pattern[choice['point'][1]][choice['point'][0]] = color;
   }
+
+  if (check(pattern, color)) {
+    alert(color === 2 ? '❌ is win' : '⭕️ is win');
+  }
+  color = 3 - color;
+  init(pattern);
 }
 
 function check(pattern, color) {
@@ -98,11 +114,45 @@ function willWin(pattern, color) {
       const temp = clone(pattern);
       temp[i][j] = color;
       if (check(temp, color)) {
-        return true;
+        // return true;
+        return [j, i];
       }
     }
   }
-  return false;
+  // return false;
+  return null;
+}
+
+function bestChoices(pattern, color) {
+  let p;
+  if ((p = willWin(pattern, color))) {
+    return {
+      point: p,
+      result: 1,
+    };
+  }
+
+  let result = -2;
+  let point = null;
+  for (let i = 0; i < pattern['length']; ++i) {
+    for (let j = 0; j < pattern[i]['length']; ++j) {
+      if (pattern[i][j]) continue;
+
+      const temp = clone(pattern);
+      temp[i][j] = color;
+      let r = bestChoices(temp, 3 - color)['result'];
+
+      if (-r > result) {
+        result = -r;
+        point = [j, i];
+      }
+    }
+  }
+
+  return {
+    point: point,
+    result: point ? result : 0,
+  };
 }
 
 let color = 1;
