@@ -1,5 +1,5 @@
 // 规则
-const pattern = [[2, 0, 1], [0, 1, 1], [0, 0, 0]];
+const pattern = [[0, 0, 0], [0, 0, 0], [0, 0, 0]];
 
 /**
  *
@@ -8,17 +8,81 @@ const pattern = [[2, 0, 1], [0, 1, 1], [0, 0, 0]];
  */
 function init(pattern) {
   const board = document.querySelector('#board');
+  board.innerHTML = '';
   for (let i = 0; i < pattern['length']; ++i) {
     for (let j = 0; j < pattern[i]['length']; ++j) {
       const cell = document.createElement('div');
       cell.classList.add('cell');
       cell.textContent =
-        pattern[i][j] === 2 ? '⭕️' : pattern[i][j] === 1 ? '❌' : '';
+        pattern[i][j] === 1 ? '⭕️' : pattern[i][j] === 2 ? '❌' : '';
+      cell.addEventListener('click', () => move(j, i));
       board.appendChild(cell);
     }
     const br = document.createElement('br');
     board.appendChild(br);
   }
 }
+
+function move(x, y) {
+  pattern[y][x] = color;
+  if (check()) {
+    alert(color === 2 ? '❌ is win' : '⭕️ is win');
+  }
+  color = 3 - color;
+  init(pattern);
+}
+
+function check() {
+  for (let i = 0; i < 3; ++i) {
+    let win = true;
+    for (let j = 0; j < 3; ++j) {
+      if (pattern[j][i] !== color) {
+        win = false;
+        break;
+      }
+    }
+    if (win) {
+      return win;
+    }
+  }
+  for (let i = 0; i < 3; ++i) {
+    let win = true;
+    for (let j = 0; j < 3; ++j) {
+      if (pattern[i][j] !== color) {
+        win = false;
+        break;
+      }
+    }
+    if (win) {
+      return win;
+    }
+  }
+  // 斜线的情况 0,0 1,1 2,2
+  {
+    let win = true;
+    for (let i = 0; i < 3; ++i) {
+      if (pattern[i][i] !== color) {
+        win = false;
+      }
+    }
+    if (win) {
+      return win;
+    }
+  }
+  // 0,2  1,1 2,0
+  {
+    let win = true;
+    for (let i = 0; i < 3; ++i) {
+      if (pattern[i][2 - i] !== color) {
+        win = false;
+      }
+    }
+    if (win) {
+      return win;
+    }
+  }
+}
+
+let color = 1;
 
 init(pattern);
