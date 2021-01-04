@@ -88,6 +88,10 @@
           this.compare = compare || ((a, b) => a - b);
         }
 
+        get length() {
+          return this.data.length;
+        }
+
         take() {
           if (!this.data.length) return;
           let min = this.data[0];
@@ -113,7 +117,11 @@
       async function findPath(map, start, end) {
         // 广度优先遍历
         const table = Object.create(map);
-        const queue = [start];
+        // const queue = [start];
+        const queue = new Sorted([start], (a, b) => distance(a) - distance(b));
+        function distance(point) {
+          return (point[0] - end[0]) ** 2 + (point[1] - end[1]) ** 2;
+        }
 
         async function insert(x, y, pre) {
           if (x < 0 || x >= 100 || y < 0 || y >= 100) {
@@ -123,15 +131,15 @@
             return;
           }
 
-          await sleep(10);
           container.children[y * 100 + x].style.backgroundColor = 'lightgreen';
 
           table[y * 100 + x] = pre;
-          queue.push([x, y]);
+          queue.give([x, y]);
         }
 
         while (queue['length']) {
-          let [x, y] = queue.shift();
+          let [x, y] = queue.take();
+          console.log(x, y);
           if (x === end[0] && y === end[1]) {
             let path = [];
 
