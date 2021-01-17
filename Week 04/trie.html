@@ -1,0 +1,49 @@
+<script>
+  let $ = Symbol("$"); // 防止字符串中 ‘$’ 影响
+  class Trie {
+    constructor() {
+      this.root = Object.create(null); // 创建一个干净的对象 或者 使用 Map存储
+    }
+    insert(word) {
+      let node = this.root;
+      for (let i of word) {
+        if (!node[i]) {
+          node[i] = Object.create(null);
+        }
+        node = node[i];
+      }
+      if (!($ in node)) {
+        node[$] = 0;
+      }
+      node[$]++;
+    }
+    most() {
+      let max = 0;
+      let maxWord = null;
+      let visit = (node, word) => {
+        if (node[$] && node[$] > max) {
+          max = node[$];
+          maxWord = word;
+        }
+        for (let j in node) {
+          visit(node[j], word + j);
+        }
+      };
+      visit(this.root, "");
+      console.log(maxWord, max);
+    }
+  }
+
+  function randomWord(length) {
+    let s = "";
+    for (let i = 0; i < length; i++) {
+      s += String.fromCharCode(Math.random() * 26 + "a".charCodeAt(0));
+    }
+    return s;
+  }
+  let trie = new Trie();
+
+  for (let i = 0; i < 100000; i++) {
+    trie.insert(randomWord(4));
+  }
+</script>
